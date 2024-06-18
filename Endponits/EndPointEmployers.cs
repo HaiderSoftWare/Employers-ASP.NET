@@ -21,6 +21,27 @@ namespace employers.Endpoints
 
             app.MapGet("/employers/{id}", (int id) =>
             employers.Find(employer => employer.id == id));
+
+
+            // login employer end point
+            app.MapPost("/employer/auth", (EmployerAuth employerAuth) =>
+            {
+                EmployerAuth emploer = new(employerAuth.phone, employerAuth.password);
+                return Results.Ok(emploer);
+            });
+
+            // update employer info
+            app.MapPut("/employers/{id}", (int id, UpdateEmployer updateEmployer) =>
+            {
+
+                int index = employers.FindIndex(employer => employer.id == id);
+                employers[index] = new EmploerModel(
+                    id,
+                    updateEmployer.employerName,
+                    updateEmployer.employerFeild
+                );
+            });
+
         }
     }
 }
