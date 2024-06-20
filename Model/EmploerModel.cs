@@ -3,7 +3,7 @@
 public record class EmploerModel
 (
     int id,
-    string employerName,
-    string employerFeild
+    string employer_name,
+    string employer_feild
 
 );

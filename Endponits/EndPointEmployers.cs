@@ -9,7 +9,7 @@ namespace employers.Endpoints
         {
             app.MapPost("/employer", (EmploerModel emploerModel) =>
             {
-                EmploerModel emploer = new(emploerModel.id, emploerModel.employerName, emploerModel.employerFeild);
+                EmploerModel emploer = new(emploerModel.id, emploerModel.employer_name, emploerModel.employer_feild);
                 employers.Add(emploer);
                 return Results.Ok(emploer);
             });
