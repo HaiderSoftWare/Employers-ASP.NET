@@ -9,5 +9,5 @@ class EmployerDb : DbContext
     public EmployerDb(DbContextOptions<EmployerDb> options)
         : base(options) { }
 
-    public DbSet<EmploerModel> Articles { get; set; }
+    public DbSet<EmploerModel> employer { get; set; }
 }

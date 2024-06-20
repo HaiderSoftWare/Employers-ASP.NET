@@ -1,5 +1,6 @@
 ﻿
 using employers.Model;
+using Microsoft.EntityFrameworkCore;
 
 namespace employers.Endpoints
 {
@@ -14,13 +15,24 @@ namespace employers.Endpoints
                 return Results.Ok(emploer);
             });
 
-            app.MapGet("/employers", () =>
-            {
-                return Results.Ok(employers);
-            });
+            // get employers from db
+            app.MapGet("/employers", async (EmployerDb dbContext) =>
+{
+    var employers = await dbContext.employer.ToListAsync();
+    return Results.Ok(employers);
+});
 
-            app.MapGet("/employers/{id}", (int id) =>
-            employers.Find(employer => employer.id == id));
+            // app.MapGet("/employers/{id}", (int id) =>
+            // employers.Find(employer => employer.id == id));
+            app.MapGet("/employers/{id:int}", async (int id, EmployerDb dbContext) =>
+{
+    var employer = await dbContext.employer.FindAsync(id);
+    if (employer == null)
+    {
+        return Results.NotFound();
+    }
+    return Results.Ok(employer);
+});
 
 
             // login employer end point
