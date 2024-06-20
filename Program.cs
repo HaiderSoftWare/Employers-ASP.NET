@@ -12,7 +12,7 @@ var configuration = new ConfigurationBuilder()
     .Build();
 
 // Configure services
-builder.Services.AddSingleton<List<EmploerModel>>(); // Register a singleton list to hold employers.
+builder.Services.AddSingleton<List<EmploerModel>>();
 builder.Services.AddDbContext<EmployerDb>(options =>
     options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
 
