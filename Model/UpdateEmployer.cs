@@ -2,7 +2,6 @@
 
 public record class UpdateEmployer
 (
-    int id,
-    string employerName,
-    string employerFeild
+    string employer_name,
+    string employer_feild
 );
