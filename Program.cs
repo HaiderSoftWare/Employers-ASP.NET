@@ -12,17 +12,12 @@ var configuration = new ConfigurationBuilder()
     .Build();
 
 // Configure services
-builder.Services.AddSingleton<List<EmploerModel>>();
 builder.Services.AddDbContext<EmployerDb>(options =>
     options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
 
 
 var app = builder.Build();
 app.UseHttpsRedirection();
-app.MapEmployerEndpoints(app.Services.GetRequiredService<List<EmploerModel>>());
-
-
-
-
+app.MapEmployerEndpoints();
 
 app.Run();

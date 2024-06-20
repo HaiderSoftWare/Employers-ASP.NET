@@ -6,7 +6,7 @@ namespace employers.Endpoints
 {
     public static class EmployerEndpoints
     {
-        public static void MapEmployerEndpoints(this IEndpointRouteBuilder app, List<EmploerModel> employers)
+        public static void MapEmployerEndpoints(this IEndpointRouteBuilder app)
         {
             // create new employer with db
             app.MapPost("/employers", async (CreateEmployer createEmployerDto, EmployerDb dbContext) =>
@@ -42,23 +42,43 @@ namespace employers.Endpoints
                         return Results.Ok(employer);
                     });
 
-            // update employer info
+            // delete employer form db
+            app.MapDelete("/employers/{id:int}", async (int id, EmployerDb dbContext) =>
+            {
+                var employer = await dbContext.employer.FindAsync(id);
+                if (employer == null)
+                {
+                    return Results.NotFound();
+                }
+                dbContext.employer.Remove(employer);
+                await dbContext.SaveChangesAsync();
+                return Results.NoContent();
 
+            });
 
+            // update employer information
+            app.MapPut("/employers/{id:int}", async (int id, UpdateEmployer updatedEmployer, EmployerDb dbContext) =>
+            {
+                var employer = await dbContext.employer.FindAsync(id);
+                if (employer == null)
+                {
+                    return Results.NotFound();
+                }
+                // Create a new instance with updated values
+                var updatedEntity = employer with
+                {
+                    employer_name = updatedEmployer.employer_name,
+                    employer_feild = updatedEmployer.employer_feild
+                    // Add other properties to update as needed
+                };
 
-            //             app.MapPut("/employers/{id:int}", async (int id, UpdateEmployer updateEmployer, EmployerDb dbContext) =>
-            // {
-            //     var employer = await dbContext.employer.FindAsync(id);
-            //     if (employer == null)
-            //     {
-            //         return Results.NotFound();
-            //     }
-            //     employer.employer_name
-            //     await dbContext.SaveChangesAsync();
+                // Update the entity in the DbContext
+                dbContext.Entry(employer).CurrentValues.SetValues(updatedEntity);
 
-            //     return Results.NoContent(); // Return 204 No Content to indicate success
-            // });
+                await dbContext.SaveChangesAsync();
 
+                return Results.Ok(updatedEntity);
+            });
 
         }
     }
