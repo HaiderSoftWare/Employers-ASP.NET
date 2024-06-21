@@ -9339,11 +9339,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/hhhff/Desktop/employers/employers/employers.csproj",
+      "projectUniqueName": "/Users/hhhff/Desktop/employers backend/employers/employers.csproj",
       "projectName": "employers",
-      "projectPath": "/Users/hhhff/Desktop/employers/employers/employers.csproj",
+      "projectPath": "/Users/hhhff/Desktop/employers backend/employers/employers.csproj",
       "packagesPath": "/Users/hhhff/.nuget/packages/",
-      "outputPath": "/Users/hhhff/Desktop/employers/employers/obj/",
+      "outputPath": "/Users/hhhff/Desktop/employers backend/employers/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/Users/hhhff/.nuget/NuGet/NuGet.Config"

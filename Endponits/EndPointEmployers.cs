@@ -79,7 +79,23 @@ namespace employers.Endpoints
 
                 return Results.Ok(updatedEntity);
             });
+            // login new user 
+            // create new employer with db
+            app.MapPost("/employer", async (NewEmployerLogin userModel, EmployerDb dbContext) =>
+                {
 
+                    var login = new UserModel
+                    (
+                        userModel.id,
+                        userModel.phone,
+                        userModel.password
+                    );
+
+                    dbContext.auth.Add(login);
+                    await dbContext.SaveChangesAsync();
+
+                    return Results.Created($"/employer/{login.phone}", login);
+                });
         }
     }
 }

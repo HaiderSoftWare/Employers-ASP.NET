@@ -10,4 +10,5 @@ class EmployerDb : DbContext
         : base(options) { }
 
     public DbSet<EmploerModel> employer { get; set; }
+    public DbSet<UserModel> auth { get; set; }
 }

@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <Folder Include="Endponits/endponits/" />
+    <Folder Include="Model/Auth/" />
   </ItemGroup>
 
   <ItemGroup>
