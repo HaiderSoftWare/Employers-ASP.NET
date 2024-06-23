@@ -1,6 +1,10 @@
 ﻿
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 using employers.Model;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 namespace employers.Endpoints
 {
@@ -27,11 +31,37 @@ namespace employers.Endpoints
 
 
             // get employers from db
-            app.MapGet("/employers", async (EmployerDb dbContext) =>
-                {
-                    var employers = await dbContext.employer.ToListAsync();
-                    return Results.Ok(employers);
-                });
+            // app.MapGet("/employers", async (EmployerDb dbContext) =>
+            //     {
+            //         var employers = await dbContext.employer.ToListAsync();
+            //         return Results.Ok(employers);
+            //     });
+            app.MapGet("/employers", async (EmployerDb dbContext, HttpRequest request) =>
+{
+    // Retrieve query parameters
+    string? employer_name = request.Query["employer_name"];
+    string? employer_feild = request.Query["employer_feild"];
+
+    // Create a queryable collection from the employers table
+    var query = dbContext.employer.AsQueryable();
+
+    // Apply filters if query parameters are provided
+    if (!string.IsNullOrEmpty(employer_name))
+    {
+        query = query.Where(e => e.employer_name.Contains(employer_name));
+    }
+
+    if (!string.IsNullOrEmpty(employer_feild))
+    {
+        query = query.Where(e => e.employer_feild.Contains(employer_feild));
+    }    // Execute the query and get the results
+    var employers = await query.ToListAsync();
+
+    // Return the results
+    return Results.Ok(employers);
+});
+
+            // get employer by id
             app.MapGet("/employers/{id:int}", async (int id, EmployerDb dbContext) =>
                     {
                         var employer = await dbContext.employer.FindAsync(id);
@@ -79,23 +109,65 @@ namespace employers.Endpoints
 
                 return Results.Ok(updatedEntity);
             });
-            // login new user 
-            // create new employer with db
             app.MapPost("/employer", async (NewEmployerLogin userModel, EmployerDb dbContext) =>
+            {
+                var login = new UserModel
+                (
+                    userModel.id,
+                    userModel.phone,
+                    userModel.password
+                );
+
+                dbContext.auth.Add(login);
+                await dbContext.SaveChangesAsync();
+
+                // Generate JWT token
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var key = Encoding.ASCII.GetBytes("PP3DIPgqoaoevmc9tWLxreFxNf1laJAB1HgDDmvQ+xA=");
+                var tokenDescriptor = new SecurityTokenDescriptor
                 {
+                    Subject = new ClaimsIdentity(new Claim[]
+                    {
+            new Claim(ClaimTypes.Name, login.id.ToString()),
+            new Claim(ClaimTypes.MobilePhone, login.phone)
+                    }),
+                    Expires = DateTime.UtcNow.AddHours(1),
+                    SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+                };
+                var token = tokenHandler.CreateToken(tokenDescriptor);
+                var tokenString = tokenHandler.WriteToken(token);
 
-                    var login = new UserModel
-                    (
-                        userModel.id,
-                        userModel.phone,
-                        userModel.password
-                    );
+                var response = new
+                {
+                    Status = true,
+                    Message = "Login successfully",
+                    Token = tokenString,
+                    Data = login
+                };
 
-                    dbContext.auth.Add(login);
-                    await dbContext.SaveChangesAsync();
+                return Results.Ok(response);
+            });
 
-                    return Results.Created($"/employer/{login.phone}", login);
+
+            // get all users from db
+            app.MapGet("/users", async (EmployerDb dbContext) =>
+                {
+                    var employers = await dbContext.auth.ToListAsync();
+                    return Results.Ok(employers);
                 });
+            // delete user form db
+            app.MapDelete("/user/{id:int}", async (int id, EmployerDb dbContext) =>
+        {
+            var employer = await dbContext.auth.FindAsync(id);
+            if (employer == null)
+            {
+                return Results.NotFound();
+            }
+            dbContext.auth.Remove(employer);
+            await dbContext.SaveChangesAsync();
+            return Results.NoContent();
+
+        });
         }
     }
 }
